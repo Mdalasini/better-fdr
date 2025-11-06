@@ -4,6 +4,7 @@ import Game from "@/lib/domain/Game";
 import Team from "@/lib/domain/Team";
 import TeamLogo from "@/lib/domain/TeamLogo";
 import dbConnect from "@/lib/infra/mongoose";
+import type { TeamsResponse } from "@/lib/types/teams";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -25,7 +26,7 @@ export async function GET(request: Request) {
   const teamLogos = await TeamLogo.find({ team_id: { $in: teamIds } });
   const elos = await Elo.find({ team_id: { $in: teamIds } });
 
-  const teamsData = teams.map((team) => {
+  const teamsData: TeamsResponse = teams.map((team) => {
     const teamLogo = teamLogos.find((logo) => logo.team_id === team.team_id);
     const teamElo = elos.find((elo) => elo.team_id === team.team_id);
 

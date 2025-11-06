@@ -1,9 +1,11 @@
 import { NextResponse } from "next/server";
 import Game from "@/lib/domain/Game";
 import dbConnect from "@/lib/infra/mongoose";
+import type { GameweekUpdateRequest } from "@/lib/types/gameweek";
 
 export async function PUT(request: Request) {
-  const { home_id, away_id, gameweek } = await request.json();
+  const { home_id, away_id, gameweek }: GameweekUpdateRequest =
+    await request.json();
 
   if (!home_id || !away_id || !gameweek) {
     return NextResponse.json(

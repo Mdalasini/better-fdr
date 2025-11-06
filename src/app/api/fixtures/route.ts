@@ -2,12 +2,7 @@ import { NextResponse } from "next/server";
 import Game from "@/lib/domain/Game";
 import Team from "@/lib/domain/Team";
 import dbConnect from "@/lib/infra/mongoose";
-
-interface Fixture {
-  opponent_id: string;
-  gameweek: number;
-  home: boolean;
-}
+import type { FixturesResponse } from "@/lib/types/fixtures";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -25,7 +20,7 @@ export async function GET(request: Request) {
   const games = await Game.find({ season });
   const teams = await Team.find({});
 
-  const fixtures: Record<string, Fixture[]> = {};
+  const fixtures: FixturesResponse = {};
 
   teams.forEach((team) => {
     fixtures[team.team_id] = [];
