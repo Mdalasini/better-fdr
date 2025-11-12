@@ -6,4 +6,4 @@ const TeamLogoSchema = new Schema({
 });
 
 export default mongoose.models.TeamLogo ||
-  mongoose.model("TeamLogo", TeamLogoSchema);
+  mongoose.model("team_logos", TeamLogoSchema);

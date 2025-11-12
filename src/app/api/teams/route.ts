@@ -34,9 +34,9 @@ export async function GET(request: Request) {
       team_id: team.team_id,
       name: team.name,
       short_name: team.short_name,
-      off_rating: teamElo ? teamElo.off_elo : null,
-      def_rating: teamElo ? teamElo.def_elo : null,
-      logo_path: teamLogo ? teamLogo.logo_path : null,
+      off_rating: teamElo.off_elo,
+      def_rating: teamElo.def_elo,
+      logo_path: teamLogo.logo_path,
     };
   });
 
