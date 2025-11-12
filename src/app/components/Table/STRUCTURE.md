@@ -107,7 +107,7 @@ TableNew/
 
 ### utils.ts (~78 lines)
 - ✅ initDifficultyModel() - League mean calculation
-- ✅ fixtureForTeamInWeek() - Fixture filtering
+- ✅ opponetsForTeamInWeek() - Opponent filtering
 - ✅ getAttack() - Attack calculation & difficulty
 - ✅ getDefense() - Defense calculation & difficulty
 - ✅ Helper: squash() - Sigmoid normalization
@@ -149,7 +149,7 @@ const [sortColumn, setSortColumn] = useState(-1)
 
 ### TableCell
 ```html
-<td 
+<td
   data-offense="0.45"
   data-defense="0.62"
   data-offense-difficulty="medium"
@@ -159,7 +159,7 @@ const [sortColumn, setSortColumn] = useState(-1)
 
 ### TableRow (Team Cell)
 ```html
-<td 
+<td
   data-team-id="1"
   data-offense="2.15"
   data-defense="3.10"

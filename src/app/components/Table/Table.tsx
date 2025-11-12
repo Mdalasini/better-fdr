@@ -14,20 +14,31 @@ const queryClient = new QueryClient();
 const SEASON = "2025-2026";
 const WINDOW_SIZE = 10;
 
-function getMinMax(fixtures: Record<string, Fixture[]>): [number, number] {
-  const allGameweeks: number[] = [];
-  Object.values(fixtures).forEach((list) => {
-    list.forEach((f) => {
-      allGameweeks.push(f.gameweek);
-    });
+function getMinMaxGameweek(fixtures: Fixture[]): { min: number; max: number } {
+  if (fixtures.length === 0) {
+    return {
+      min: 0,
+      max: 0,
+    };
+  }
+
+  const gameweeks = fixtures.map((fixture) => fixture.gameweek);
+
+  return {
+    min: Math.min(...gameweeks),
+    max: Math.max(...gameweeks),
+  };
+}
+
+function getUniqueTeamIds(fixtures: Fixture[]): string[] {
+  const teamIds = new Set<string>();
+
+  fixtures.forEach((fixture) => {
+    teamIds.add(fixture.home_id);
+    teamIds.add(fixture.away_id);
   });
 
-  if (allGameweeks.length === 0) return [1, 1];
-
-  const minWeek = Math.min(...allGameweeks);
-  const maxWeek = Math.max(...allGameweeks);
-
-  return [minWeek, maxWeek];
+  return Array.from(teamIds);
 }
 
 export default function FixtureTable() {
@@ -90,17 +101,17 @@ function Table() {
 
   initDifficultyModel(teamsQuery.data);
 
-  const [minWeek, maxWeek] = getMinMax(fixturesQuery.data);
+  const gameweekStats = getMinMaxGameweek(fixturesQuery.data);
   const [windowMin, windowMax] = window;
 
   function handleWindowChange(direction: "next" | "prev") {
     setWindow(([min, max]) => {
       if (direction === "next") {
-        const nextMax = Math.min(maxWeek, max + 1);
+        const nextMax = Math.min(gameweekStats.max, max + 1);
         const nextMin = Math.min(min + 1, nextMax - WINDOW_SIZE + 1);
         return [nextMin, nextMax];
       }
-      const nextMin = Math.max(minWeek, min - 1);
+      const nextMin = Math.max(gameweekStats.min, min - 1);
       const nextMax = Math.max(nextMin + WINDOW_SIZE - 1, min - 1);
       return [nextMin, nextMax];
     });
@@ -131,8 +142,8 @@ function Table() {
         sortBy={sortBy}
         windowMin={windowMin}
         windowMax={windowMax}
-        minWeek={minWeek}
-        maxWeek={maxWeek}
+        minWeek={gameweekStats.min}
+        maxWeek={gameweekStats.max}
       />
       <div className="overflow-x-auto whitespace-nowrap">
         <table
@@ -145,7 +156,7 @@ function Table() {
             handleSort={handleSort}
           />
           <tbody>
-            {Object.keys(fixturesQuery.data).map((teamId) => (
+            {getUniqueTeamIds(fixturesQuery.data).map((teamId) => (
               <TableRow
                 season={SEASON}
                 sortBy={sortBy}

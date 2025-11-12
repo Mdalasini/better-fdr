@@ -3,6 +3,11 @@ import type { TeamData } from "@/lib/types/teams";
 
 let LEAGUE_MEAN = 0;
 
+interface Opponent {
+  team_id: string;
+  home: boolean;
+}
+
 export function initDifficultyModel(allTeams: TeamData[]): void {
   if (allTeams.length === 0) {
     return;
@@ -14,12 +19,21 @@ export function initDifficultyModel(allTeams: TeamData[]): void {
   LEAGUE_MEAN = mean;
 }
 
-export function fixtureForTeamInWeek(
-  src: FixturesResponse,
+export function opponentsForTeamInWeek(
   teamId: string,
   gameweek: number,
-): Fixture[] {
-  return (src[teamId] || []).filter((f) => f.gameweek === gameweek);
+  fixtures: Fixture[],
+): Opponent[] {
+  return fixtures
+    .filter((fixture) => fixture.gameweek === gameweek)
+    .map((fixture) => {
+      if (fixture.home_id === teamId)
+        return { team_id: fixture.away_id, home: true };
+      if (fixture.away_id === teamId)
+        return { team_id: fixture.home_id, home: false };
+      return null;
+    })
+    .filter((opponent): opponent is Opponent => opponent !== null);
 }
 
 function squash(x: number, k = 0.01): number {
@@ -38,14 +52,14 @@ function combineWeightedDefense(scores: number[]): number {
 
 export function getAttack(
   offenseA: number,
-  fixtures: Fixture[],
+  opponents: Opponent[],
   teamById: Record<string, TeamData>,
   k = 0.01,
 ): { gw_attack: number; difficulty: "easy" | "medium" | "hard" | "invalid" } {
-  if (fixtures.length === 0) return { gw_attack: 0, difficulty: "invalid" };
+  if (opponents.length === 0) return { gw_attack: 0, difficulty: "invalid" };
 
-  const scores = fixtures.map((f) =>
-    squash(offenseA + teamById[f.opponent_id].def_rating, k),
+  const scores = opponents.map((opponent) =>
+    squash(offenseA + teamById[opponent.team_id].def_rating, k),
   );
   const gw_attack = combineWeightedOffense(scores);
 
@@ -57,17 +71,17 @@ export function getAttack(
 
 export function getDefense(
   defenseA: number,
-  fixtures: Fixture[],
+  opponents: Opponent[],
   teamById: Record<string, TeamData>,
   k = 0.01,
 ): {
   gw_defense: number;
   difficulty: "easy" | "medium" | "hard" | "invalid";
 } {
-  if (fixtures.length === 0) return { gw_defense: 0, difficulty: "invalid" };
+  if (opponents.length === 0) return { gw_defense: 0, difficulty: "invalid" };
 
-  const scores = fixtures.map((f) =>
-    squash(defenseA + teamById[f.opponent_id].off_rating, k),
+  const scores = opponents.map((opponent) =>
+    squash(defenseA + teamById[opponent.team_id].off_rating, k),
   );
   const gw_defense = combineWeightedDefense(scores);
 

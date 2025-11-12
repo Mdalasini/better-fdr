@@ -3,7 +3,7 @@
 import { useFixtures } from "@/lib/hooks/useFixtures";
 import { useTeams } from "@/lib/hooks/useTeams";
 import type { TeamData } from "@/lib/types/teams";
-import { fixtureForTeamInWeek, getAttack, getDefense } from "./utils";
+import { opponentsForTeamInWeek, getAttack, getDefense } from "./utils";
 
 interface Props {
   teamId: string;
@@ -25,10 +25,10 @@ export default function TableCell({ teamId, gameweek, sortBy, season }: Props) {
 
   if (!fixturesQuery.data || !teamsQuery.data) return null;
 
-  const weekFixtures = fixtureForTeamInWeek(
-    fixturesQuery.data,
+  const weekOpponents = opponentsForTeamInWeek(
     teamId,
     gameweek,
+    fixturesQuery.data,
   );
 
   // team lookup table
@@ -39,12 +39,12 @@ export default function TableCell({ teamId, gameweek, sortBy, season }: Props) {
 
   const attackStats = getAttack(
     teamById[teamId].off_rating,
-    weekFixtures,
+    weekOpponents,
     teamById,
   );
   const defenseStats = getDefense(
     teamById[teamId].def_rating,
-    weekFixtures,
+    weekOpponents,
     teamById,
   );
 
@@ -61,12 +61,12 @@ export default function TableCell({ teamId, gameweek, sortBy, season }: Props) {
       data-defense-difficulty={defenseStats.difficulty}
     >
       <div className="flex flex-col items-center justify-center w-full h-full gap-1">
-        {weekFixtures && weekFixtures.length > 0 ? (
-          weekFixtures.map((f) => (
-            <div key={f.opponent_id} className="text-sm truncate w-full px-1">
-              {f.home
-                ? `H:${teamById[f.opponent_id].short_name}`
-                : `A:${teamById[f.opponent_id].short_name}`}
+        {weekOpponents && weekOpponents.length > 0 ? (
+          weekOpponents.map((opp) => (
+            <div key={opp.team_id} className="text-sm truncate w-full px-1">
+              {opp.home
+                ? `H:${teamById[opp.team_id].short_name}`
+                : `A:${teamById[opp.team_id].short_name}`}
             </div>
           ))
         ) : (

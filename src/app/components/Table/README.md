@@ -44,7 +44,7 @@ The TableNew component displays team fixtures across gameweeks with color-coded 
 
 **utils.ts** - Difficulty calculations
 - `initDifficultyModel()` - Initialize league mean for calculations
-- `fixtureForTeamInWeek()` - Get fixtures for a team in a specific gameweek
+- `opponetsForTeamInWeek()` - Get opponents for a team in a specific gameweek
 - `getAttack()` - Calculate attacking potential and difficulty
 - `getDefense()` - Calculate defensive strength and difficulty
 - Helper functions: `squash()`, `combineWeightedOffense()`, `combineWeightedDefense()`

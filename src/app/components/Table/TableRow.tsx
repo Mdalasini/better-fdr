@@ -5,7 +5,7 @@ import { useFixtures } from "@/lib/hooks/useFixtures";
 import { useTeams } from "@/lib/hooks/useTeams";
 import type { TeamData } from "@/lib/types/teams";
 import TableCell from "./TableCell";
-import { fixtureForTeamInWeek, getAttack, getDefense } from "./utils";
+import { opponentsForTeamInWeek, getAttack, getDefense } from "./utils";
 
 interface Props {
   teamId: string;
@@ -15,13 +15,7 @@ interface Props {
   season: string;
 }
 
-export default function TableRow({
-  teamId,
-  min,
-  max,
-  sortBy,
-  season,
-}: Props) {
+export default function TableRow({ teamId, min, max, sortBy, season }: Props) {
   const teamsQuery = useTeams(season);
   const fixturesQuery = useFixtures(season);
 
@@ -33,6 +27,8 @@ export default function TableRow({
     teamById[team.team_id] = team;
   });
 
+  console.log(teamById);
+
   // Calculate sums for first 5 gameweeks
   const weeksToSum = Math.min(5, max - min + 1);
   let totalOffense = 0;
@@ -40,20 +36,20 @@ export default function TableRow({
 
   for (let i = 0; i < weeksToSum; i++) {
     const gameweek = min + i;
-    const weekFixtures = fixtureForTeamInWeek(
-      fixturesQuery.data,
+    const weekOpponents = opponentsForTeamInWeek(
       teamId,
       gameweek,
+      fixturesQuery.data,
     );
 
     const attackStats = getAttack(
       teamById[teamId].off_rating,
-      weekFixtures,
+      weekOpponents,
       teamById,
     );
     const defenseStats = getDefense(
       teamById[teamId].def_rating,
-      weekFixtures,
+      weekOpponents,
       teamById,
     );
     totalOffense += attackStats.gw_attack;
