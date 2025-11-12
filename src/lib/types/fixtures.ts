@@ -1,7 +1,10 @@
 export interface Fixture {
-  opponent_id: string;
+  home_id: string;
+  away_id: string;
   gameweek: number;
-  home: boolean;
+  season: string;
+  home_xg: string | null;
+  away_xg: string | null;
 }
 
-export type FixturesResponse = Record<string, Fixture[]>;
+export type FixturesResponse = Fixture[];

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import Game from "@/lib/domain/Game";
 import dbConnect from "@/lib/infra/mongoose";
-import type { FixturesResponse } from "@/lib/types/fixtures";
+import type { Fixture, FixturesResponse } from "@/lib/types/fixtures";
 
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
@@ -16,33 +16,16 @@ export async function GET(request: Request) {
 
   await dbConnect();
 
-  const games = await Game.find({ season });
+  const games = await Game.find({ season }).lean<Fixture[]>();
 
-  const fixtures: FixturesResponse = {};
-
-  games.forEach((game) => {
-    if (!fixtures[game.home_id]) {
-      fixtures[game.home_id] = [];
-    }
-    if (fixtures[game.home_id]) {
-      fixtures[game.home_id].push({
-        opponent_id: game.away_id,
-        gameweek: game.gameweek,
-        home: true,
-      });
-    }
-
-    if (!fixtures[game.away_id]) {
-      fixtures[game.away_id] = [];
-    }
-    if (fixtures[game.away_id]) {
-      fixtures[game.away_id].push({
-        opponent_id: game.home_id,
-        gameweek: game.gameweek,
-        home: false,
-      });
-    }
-  });
+  const fixtures: FixturesResponse = games.map((game) => ({
+    home_id: game.home_id,
+    away_id: game.away_id,
+    home_xg: game.home_xg,
+    away_xg: game.away_xg,
+    season: game.season,
+    gameweek: game.gameweek,
+  }));
 
   return NextResponse.json(fixtures);
 }
