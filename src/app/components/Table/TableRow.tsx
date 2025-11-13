@@ -5,7 +5,7 @@ import { useFixtures } from "@/lib/hooks/useFixtures";
 import { useTeams } from "@/lib/hooks/useTeams";
 import type { TeamData } from "@/lib/types/teams";
 import TableCell from "./TableCell";
-import { opponentsForTeamInWeek, getAttack, getDefense } from "./utils";
+import { opponentsForTeamInRange, getAttack, getDefense } from "./utils";
 
 interface Props {
   teamId: string;
@@ -27,34 +27,15 @@ export default function TableRow({ teamId, min, max, sortBy, season }: Props) {
     teamById[team.team_id] = team;
   });
 
-  console.log(teamById);
+  const opponents = opponentsForTeamInRange(
+    teamId,
+    min,
+    max,
+    fixturesQuery.data,
+  );
 
-  // Calculate sums for first 5 gameweeks
-  const weeksToSum = Math.min(5, max - min + 1);
-  let totalOffense = 0;
-  let totalDefense = 0;
-
-  for (let i = 0; i < weeksToSum; i++) {
-    const gameweek = min + i;
-    const weekOpponents = opponentsForTeamInWeek(
-      teamId,
-      gameweek,
-      fixturesQuery.data,
-    );
-
-    const attackStats = getAttack(
-      teamById[teamId].off_rating,
-      weekOpponents,
-      teamById,
-    );
-    const defenseStats = getDefense(
-      teamById[teamId].def_rating,
-      weekOpponents,
-      teamById,
-    );
-    totalOffense += attackStats.gw_attack;
-    totalDefense += defenseStats.gw_defense;
-  }
+  const attackStats = getAttack(teamById[teamId].off_rating, opponents);
+  const defenseStats = getDefense(teamById[teamId].def_rating, opponents);
 
   const gameweeks = Array.from({ length: max - min + 1 }, (_, i) => min + i);
 
@@ -63,8 +44,8 @@ export default function TableRow({ teamId, min, max, sortBy, season }: Props) {
       <td
         className="px-2 py-2 text-left min-w-48 text-sm font-semibold border-b border-gray-200"
         data-team-id={teamId}
-        data-offense={totalOffense}
-        data-defense={totalDefense}
+        data-offense={attackStats.gw_attack}
+        data-defense={defenseStats.gw_defense}
       >
         <div className="flex items-center gap-3">
           <Image

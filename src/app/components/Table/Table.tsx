@@ -4,7 +4,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useFixtures } from "@/lib/hooks/useFixtures";
 import { useTeams } from "@/lib/hooks/useTeams";
 import type { Fixture } from "@/lib/types/fixtures";
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import TableControls from "./TableControls";
@@ -54,55 +54,21 @@ function Table() {
   const teamsQuery = useTeams(SEASON);
   const [window, setWindow] = useState([1, 1 + WINDOW_SIZE - 1]);
   const [sortBy, setSortBy] = useState<"offense" | "defense">("offense");
-  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
-  const [sortColumn, setSortColumn] = useState<number>(-1);
-  const tableRef = useRef<HTMLTableElement>(null);
 
-  useEffect(() => {
-    if (!tableRef.current) return;
+  // Initialize difficulty model for utils used by child rows/cells
+  if (teamsQuery.data) initDifficultyModel(teamsQuery.data);
 
-    const table = tableRef.current;
-    const tbody = table.querySelector("tbody");
-    if (!tbody) return;
-
-    const rows = Array.from(
-      tbody.querySelectorAll("tr"),
-    ) as HTMLTableRowElement[];
-
-    rows.sort((a, b) => {
-      let aVal: number, bVal: number;
-      const aCells = a.querySelectorAll("td");
-      const bCells = b.querySelectorAll("td");
-
-      const aCell = aCells[sortColumn] as HTMLTableCellElement;
-      const bCell = bCells[sortColumn] as HTMLTableCellElement;
-
-      if (sortBy === "offense") {
-        aVal = parseFloat(aCell?.dataset.offense || "0");
-        bVal = parseFloat(bCell?.dataset.offense || "0");
-      } else {
-        aVal = parseFloat(aCell?.dataset.defense || "0");
-        bVal = parseFloat(bCell?.dataset.defense || "0");
-      }
-
-      if (sortDirection === "asc") {
-        return aVal - bVal;
-      } else {
-        return bVal - aVal;
-      }
-    });
-
-    rows.forEach((row) => {
-      tbody.appendChild(row);
-    });
-  }, [sortDirection, sortColumn, sortBy]);
-
-  if (!fixturesQuery.data || !teamsQuery.data) return <div>Loading...</div>;
-
-  initDifficultyModel(teamsQuery.data);
-
-  const gameweekStats = getMinMaxGameweek(fixturesQuery.data);
+  const gameweekStats = fixturesQuery.data
+    ? getMinMaxGameweek(fixturesQuery.data)
+    : { min: 0, max: 0 };
   const [windowMin, windowMax] = window;
+
+  // Header-managed ordering: fall back to default order when unset
+  const defaultTeamIds = useMemo(
+    () => (teamsQuery.data ? teamsQuery.data.map((t) => t.team_id) : []),
+    [teamsQuery.data],
+  );
+  const [orderedTeamIds, setOrderedTeamIds] = useState<string[] | null>(null);
 
   function handleWindowChange(direction: "next" | "prev") {
     setWindow(([min, max]) => {
@@ -121,18 +87,7 @@ function Table() {
     setSortBy(newSortBy);
   }
 
-  function handleSort(column: number) {
-    if (column === sortColumn) {
-      setSortDirection(sortDirection === "asc" ? "desc" : "asc");
-    } else {
-      setSortColumn(column);
-      if (sortBy === "offense") {
-        setSortDirection("desc");
-      } else {
-        setSortDirection("asc");
-      }
-    }
-  }
+  if (!fixturesQuery.data || !teamsQuery.data) return <div>Loading...</div>;
 
   return (
     <section className="bg-white rounded-lg shadow-sm p-4 w-full">
@@ -146,17 +101,17 @@ function Table() {
         maxWeek={gameweekStats.max}
       />
       <div className="overflow-x-auto whitespace-nowrap">
-        <table
-          className="table-auto w-full border-separate border-spacing-x-2 border-spacing-y-4"
-          ref={tableRef}
-        >
+        <table className="table-auto w-full border-separate border-spacing-x-2 border-spacing-y-4">
           <TableHeader
             min={windowMin}
             max={windowMax}
-            handleSort={handleSort}
+            fixtures={fixturesQuery.data}
+            teams={teamsQuery.data}
+            sortBy={sortBy}
+            onOrderChange={(ids) => setOrderedTeamIds(ids)}
           />
           <tbody>
-            {getUniqueTeamIds(fixturesQuery.data).map((teamId) => (
+            {(orderedTeamIds ?? defaultTeamIds).map((teamId) => (
               <TableRow
                 season={SEASON}
                 sortBy={sortBy}

@@ -37,16 +37,8 @@ export default function TableCell({ teamId, gameweek, sortBy, season }: Props) {
     teamById[team.team_id] = team;
   });
 
-  const attackStats = getAttack(
-    teamById[teamId].off_rating,
-    weekOpponents,
-    teamById,
-  );
-  const defenseStats = getDefense(
-    teamById[teamId].def_rating,
-    weekOpponents,
-    teamById,
-  );
+  const attackStats = getAttack(teamById[teamId].off_rating, weekOpponents);
+  const defenseStats = getDefense(teamById[teamId].def_rating, weekOpponents);
 
   const difficulty =
     sortBy === "offense" ? attackStats.difficulty : defenseStats.difficulty;
