@@ -1,11 +1,13 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { CURRENT_SEASON } from "@/lib/config/season";
+import { CURRENT_GAMEWEEK } from "@/lib/config/gameweek";
 import { useFixtures } from "@/lib/hooks/useFixtures";
 import { useTeams } from "@/lib/hooks/useTeams";
 import FixtureCard from "@/app/components/FixtureCard";
 import type { Fixture } from "@/lib/types/fixtures";
+import { AltArrowLeft, AltArrowRight } from "@solar-icons/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
@@ -64,6 +66,18 @@ function Dashboard() {
   const gameweeks = useMemo(() => {
     return Array.from(fixturesByGameweek.keys()).sort((a, b) => a - b);
   }, [fixturesByGameweek]);
+
+  const minGameweek = gameweeks.length > 0 ? gameweeks[0] : 1;
+  const maxGameweek =
+    gameweeks.length > 0 ? gameweeks[gameweeks.length - 1] : 1;
+
+  const [currentGameweek, setCurrentGameweek] = useState(CURRENT_GAMEWEEK);
+
+  useEffect(() => {
+    if (gameweeks.length > 0 && !gameweeks.includes(currentGameweek)) {
+      setCurrentGameweek(minGameweek);
+    }
+  }, [gameweeks, currentGameweek, minGameweek]);
 
   // Loading state
   if (fixturesLoading || teamsLoading) {
@@ -153,28 +167,55 @@ function Dashboard() {
 
       {/* Fixtures by Gameweek */}
       <div className="space-y-8">
-        {gameweeks.map((gameweek) => (
-          <div key={gameweek}>
-            {/* Gameweek Header */}
-            <div className="mb-4">
-              <h2 className="text-2xl font-bold text-gray-900">
-                Gameweek {gameweek}
-              </h2>
-              <div className="mt-1 h-1 w-20 bg-blue-500 rounded"></div>
-            </div>
-
-            {/* Fixtures */}
-            <div className="space-y-2">
-              {fixturesByGameweek.get(gameweek)?.map((fixture) => (
-                <FixtureCard
-                  key={fixture.id}
-                  fixture={fixture}
-                  teamsMap={teamsMap}
-                />
-              ))}
-            </div>
+        <div>
+          {/* Gameweek Navigation */}
+          <div className="flex items-center justify-between mb-4">
+            <button
+              type="button"
+              disabled={currentGameweek === minGameweek}
+              className="px-3 py-1 text-sm border rounded-md disabled:text-gray-400"
+              onClick={() =>
+                setCurrentGameweek((prev) => Math.max(minGameweek, prev - 1))
+              }
+            >
+              <div className="flex items-center gap-2">
+                <AltArrowLeft />
+                <span>Prev GW</span>
+              </div>
+            </button>
+            <span className="text-sm text-gray-600">
+              Gameweek {currentGameweek}
+            </span>
+            <button
+              type="button"
+              disabled={currentGameweek === maxGameweek}
+              className="px-3 py-1 text-sm border rounded-md disabled:text-gray-400"
+              onClick={() =>
+                setCurrentGameweek((prev) => Math.min(maxGameweek, prev + 1))
+              }
+            >
+              <div className="flex items-center gap-2">
+                <span>Next GW</span>
+                <AltArrowRight />
+              </div>
+            </button>
           </div>
-        ))}
+        </div>
+
+        {/* Fixtures */}
+        <div className="space-y-2">
+          {fixturesByGameweek
+            .get(currentGameweek)
+            ?.map((fixture) => (
+              <FixtureCard
+                key={fixture.id}
+                fixture={fixture}
+                teamsMap={teamsMap}
+              />
+            )) || (
+            <p className="text-gray-600">No fixtures for this gameweek.</p>
+          )}
+        </div>
       </div>
     </div>
   );
