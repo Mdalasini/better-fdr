@@ -9,6 +9,7 @@ import TableHeader from "./TableHeader";
 import TableRow from "./TableRow";
 import TableControls from "./TableControls";
 import { initDifficultyModel } from "./utils";
+import { CURRENT_GAMEWEEK } from "@/lib/config/gameweek";
 
 const queryClient = new QueryClient();
 const SEASON = "2025-2026";
@@ -30,17 +31,6 @@ function getMinMaxGameweek(fixtures: Fixture[]): { min: number; max: number } {
   };
 }
 
-function getUniqueTeamIds(fixtures: Fixture[]): string[] {
-  const teamIds = new Set<string>();
-
-  fixtures.forEach((fixture) => {
-    teamIds.add(fixture.home_id);
-    teamIds.add(fixture.away_id);
-  });
-
-  return Array.from(teamIds);
-}
-
 export default function FixtureTable() {
   return (
     <QueryClientProvider client={queryClient}>
@@ -52,7 +42,10 @@ export default function FixtureTable() {
 function Table() {
   const fixturesQuery = useFixtures(SEASON);
   const teamsQuery = useTeams(SEASON);
-  const [window, setWindow] = useState([1, 1 + WINDOW_SIZE - 1]);
+  const [window, setWindow] = useState([
+    CURRENT_GAMEWEEK,
+    CURRENT_GAMEWEEK + WINDOW_SIZE - 1,
+  ]);
   const [sortBy, setSortBy] = useState<"offense" | "defense">("offense");
 
   // Initialize difficulty model for utils used by child rows/cells
