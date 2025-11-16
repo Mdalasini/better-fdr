@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo } from "react";
-import { CURRENT_SEASON } from "@/lib/config/season";
 import { useTeams } from "@/lib/hooks/useTeams";
 import TeamCard from "@/app/components/TeamCard";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -17,7 +16,7 @@ export default function TeamsDashboard() {
 }
 
 function Dashboard() {
-  const { data: teams, isLoading, error } = useTeams(CURRENT_SEASON);
+  const { data: teams, isLoading, error } = useTeams();
 
   // Sort teams by name
   const sortedTeams = useMemo(() => {
@@ -31,7 +30,6 @@ function Dashboard() {
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Teams Dashboard</h1>
-          <p className="text-gray-600 mt-2">Season: {CURRENT_SEASON}</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -51,7 +49,6 @@ function Dashboard() {
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Teams Dashboard</h1>
-          <p className="text-gray-600 mt-2">Season: {CURRENT_SEASON}</p>
         </div>
         <div className="bg-red-50 border border-red-200 rounded-lg p-6 text-red-700">
           <h2 className="font-semibold mb-2">Error Loading Teams</h2>
@@ -74,7 +71,6 @@ function Dashboard() {
       <div className="space-y-8">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Teams Dashboard</h1>
-          <p className="text-gray-600 mt-2">Season: {CURRENT_SEASON}</p>
         </div>
         <div className="bg-gray-50 border border-gray-200 rounded-lg p-8 text-center">
           <p className="text-gray-600">No teams found for this season.</p>
@@ -88,7 +84,6 @@ function Dashboard() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900">Teams Dashboard</h1>
-        <p className="text-gray-600 mt-2">Season: {CURRENT_SEASON}</p>
         <p className="text-sm text-gray-500 mt-1">
           Viewing {teams.length} teams for this season
         </p>
