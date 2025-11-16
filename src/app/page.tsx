@@ -32,6 +32,7 @@ function Table() {
   const [window, setWindow] = useState([1, 1 + WINDOW_SIZE - 1]);
   const [sortBy, setSortBy] = useState<"offense" | "defense">("offense");
   const [orderedTeamIds, setOrderedTeamIds] = useState<string[] | null>(null);
+  const [gameweekRange, setGameweekRange] = useState(5);
 
   // set initial window based on fetched current gameweek
   useEffect(() => {
@@ -152,6 +153,8 @@ function Table() {
           windowMax={windowMax}
           minWeek={gameweekStats.min}
           maxWeek={gameweekStats.max}
+          gameWeekRange={gameweekRange}
+          onGameWeekRangeChange={setGameweekRange}
         />
         <div className="overflow-x-auto mt-5">
           <table className="table-auto w-full border-separate border-spacing-x-2 border-spacing-y-4">
