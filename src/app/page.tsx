@@ -162,9 +162,9 @@ function Table() {
               min={windowMin}
               max={windowMax}
               fixtures={fixturesQuery.data}
-              teams={teamsQuery.data}
               sortBy={sortBy}
               onOrderChange={(ids) => setOrderedTeamIds(ids)}
+              gameweekRange={gameweekRange}
             />
             <tbody className="bg-white">
               {(orderedTeamIds ?? defaultTeamIds).map((teamId) => (

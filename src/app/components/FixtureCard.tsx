@@ -74,28 +74,30 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
             setIsEditing(true);
           }
         }}
-        className="w-full text-left bg-white shadow rounded-lg p-4 mb-2 cursor-pointer hover:shadow-md transition-shadow border-0"
+        className="group w-full text-left bg-white/80 backdrop-blur-sm rounded-xl p-4 sm:p-5 mb-3 cursor-pointer border border-gray-100 shadow-sm hover:shadow-md hover:border-blue-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500/30"
       >
         <div className="flex items-center justify-between">
           <div className="flex-1">
-            <p className="text-lg font-semibold text-gray-900">
-              <span className="text-blue-600">{homeTeamName}</span>
+            <p className="text-lg font-semibold text-gray-900 flex items-center flex-wrap gap-2">
+              <span className="text-blue-700">{homeTeamName}</span>
               {homeXg !== "" && (
-                <span className="text-gray-600 font-normal ml-2">
-                  ({homeXg})
+                <span className="inline-flex items-center rounded-md bg-blue-50 px-2 py-0.5 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-200">
+                  xG {homeXg}
                 </span>
               )}
-              <span className="text-gray-400 mx-3">vs</span>
+              <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 text-xs font-medium mx-1">
+                vs
+              </span>
               {awayXg !== "" && (
-                <span className="text-gray-600 font-normal mr-2">
-                  ({awayXg})
+                <span className="inline-flex items-center rounded-md bg-purple-50 px-2 py-0.5 text-xs font-medium text-purple-700 ring-1 ring-inset ring-purple-200">
+                  xG {awayXg}
                 </span>
               )}
-              <span className="text-blue-600">{awayTeamName}</span>
+              <span className="text-blue-700">{awayTeamName}</span>
             </p>
           </div>
-          <div className="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded">
-            GW: {gameweek}
+          <div className="text-xs sm:text-sm text-blue-700 bg-blue-50 px-3 py-1 rounded-full ring-1 ring-inset ring-blue-200">
+            GW {gameweek}
           </div>
         </div>
       </button>
@@ -103,11 +105,12 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
   }
 
   return (
-    <div className="bg-white shadow rounded-lg p-4 mb-2 border-2 border-blue-500">
+    <div className="bg-white rounded-xl p-5 mb-3 border border-gray-200 shadow-sm">
       <div className="space-y-4">
         {/* Team Match Display */}
         <div className="flex items-center gap-4">
-          <div className="flex-1">
+          <div className="flex items-center gap-2 flex-1">
+            <span className="text-gray-900 font-semibold">{homeTeamName}</span>
             <label htmlFor={`home-xg-${fixture.id}`} className="sr-only">
               Home Team xG
             </label>
@@ -119,13 +122,13 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
               placeholder="xG"
               step="0.1"
               min="0"
-              className="w-20 border border-gray-300 rounded px-2 py-1 focus:border-blue-500 focus:outline-none"
+              className="w-24 rounded-lg border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
             />
-            <span className="ml-2 text-gray-900 font-semibold">
-              {homeTeamName}
-            </span>
-            <span className="text-gray-400 mx-2">vs</span>
-            <span className="text-gray-900 font-semibold">{awayTeamName}</span>
+          </div>
+          <span className="inline-flex items-center px-2.5 py-0.5 rounded-full bg-gray-100 text-gray-600 text-xs font-medium">
+            vs
+          </span>
+          <div className="flex items-center gap-2 justify-end flex-1">
             <label htmlFor={`away-xg-${fixture.id}`} className="sr-only">
               Away Team xG
             </label>
@@ -137,16 +140,17 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
               placeholder="xG"
               step="0.1"
               min="0"
-              className="ml-2 w-20 border border-gray-300 rounded px-2 py-1 focus:border-blue-500 focus:outline-none"
+              className="w-24 rounded-lg border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
             />
+            <span className="text-gray-900 font-semibold">{awayTeamName}</span>
           </div>
         </div>
 
         {/* Gameweek Input */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3 bg-gray-50/60 p-3 rounded-lg border border-gray-100">
           <label
             htmlFor={`gw-${fixture.id}`}
-            className="text-sm font-medium text-gray-700"
+            className="text-sm font-medium text-gray-700 mr-2"
           >
             Gameweek:
           </label>
@@ -159,24 +163,24 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
             }
             step="1"
             min="1"
-            className="w-24 border border-gray-300 rounded px-2 py-1 focus:border-blue-500 focus:outline-none"
+            className="w-28 rounded-lg border border-gray-300 bg-white px-3 py-2 shadow-sm focus:border-blue-500 focus:ring-2 focus:ring-blue-500/30"
           />
         </div>
 
         {/* Error Message */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded px-3 py-2 text-sm text-red-700">
+          <div className="bg-red-50 border border-red-200 rounded-lg px-3.5 py-2 text-sm text-red-700">
             {error}
           </div>
         )}
 
         {/* Action Buttons */}
-        <div className="flex gap-2 justify-end">
+        <div className="flex gap-2 justify-end pt-2">
           <button
             type="button"
             onClick={handleCancel}
             disabled={updateMutation.isPending}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50"
+            className="px-4 py-2 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50"
           >
             Cancel
           </button>
@@ -184,7 +188,7 @@ export default function FixtureCard({ fixture, teamsMap }: FixtureCardProps) {
             type="button"
             onClick={handleSave}
             disabled={updateMutation.isPending}
-            className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 disabled:opacity-50 flex items-center gap-2"
+            className="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 active:bg-blue-800 disabled:opacity-50 flex items-center gap-2 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/30"
           >
             {updateMutation.isPending ? (
               <>

@@ -10,13 +10,13 @@ interface Props {
   min: number;
   max: number;
   fixtures: Fixture[];
-  teams: TeamData[];
   sortBy: "offense" | "defense";
   onOrderChange: (
     orderedTeamIds: string[],
     column: number,
     direction: "asc" | "desc",
   ) => void;
+  gameweekRange: number;
 }
 
 export default function TableHeader({
@@ -25,6 +25,7 @@ export default function TableHeader({
   fixtures,
   sortBy,
   onOrderChange,
+  gameweekRange,
 }: Props) {
   const gameweeks = useMemo(
     () => Array.from({ length: max - min + 1 }, (_, i) => min + i),
@@ -55,7 +56,7 @@ export default function TableHeader({
         fixtures.length > 0
           ? Math.max(...fixtures.map((f) => f.gameweek))
           : max;
-      const endWeek = Math.min(min + 5, overallMax);
+      const endWeek = Math.min(min + gameweekRange, overallMax);
       ordered = sortByGameweekRange(
         fixtures,
         startWeek,

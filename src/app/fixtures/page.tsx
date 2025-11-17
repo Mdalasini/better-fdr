@@ -174,7 +174,7 @@ function Dashboard() {
             <button
               type="button"
               disabled={currentGameweek === minGameweek}
-              className="px-3 py-1 text-sm border rounded-md disabled:text-gray-400"
+              className="inline-flex rounded-lg border border-gray-300 overflow-hidden px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-100 text-gray-800 bg-white hover:bg-gray-100"
               onClick={() =>
                 setCurrentGameweek((prev) => Math.max(minGameweek, prev - 1))
               }
@@ -190,7 +190,7 @@ function Dashboard() {
             <button
               type="button"
               disabled={currentGameweek === maxGameweek}
-              className="px-3 py-1 text-sm border rounded-md disabled:text-gray-400"
+              className="inline-flex rounded-lg border border-gray-300 overflow-hidden px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-100 text-gray-800 bg-white hover:bg-gray-100"
               onClick={() =>
                 setCurrentGameweek((prev) => Math.min(maxGameweek, prev + 1))
               }
