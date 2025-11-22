@@ -3,27 +3,27 @@
 import { AltArrowLeft, AltArrowRight } from "@solar-icons/react";
 
 type Props = {
-  onWindowChange: (direction: "next" | "prev") => void;
+  onWindowChangeAction: (direction: "next" | "prev") => void;
   windowMin: number;
   windowMax: number;
   minWeek: number;
   maxWeek: number;
   sortBy: "offense" | "defense";
-  onSortByChange: (sortBy: "offense" | "defense") => void;
+  onSortByChangeAction: (sortBy: "offense" | "defense") => void;
   gameWeekRange: number;
-  onGameWeekRangeChange: (gameWeekRange: number) => void;
+  onGameWeekRangeChangeAction: (gameWeekRange: number) => void;
 };
 
 export default function TableControls({
-  onWindowChange,
+  onWindowChangeAction,
   windowMin,
   windowMax,
   minWeek,
   maxWeek,
   sortBy,
-  onSortByChange,
+  onSortByChangeAction,
   gameWeekRange,
-  onGameWeekRangeChange,
+  onGameWeekRangeChangeAction,
 }: Props) {
   const rangeOptions = [3, 4, 5, 6];
   const sortOptions: ("offense" | "defense")[] = ["offense", "defense"];
@@ -32,8 +32,7 @@ export default function TableControls({
     <div>
       <div className="flex items-center gap-3">
         <span className="text-sm font-medium text-gray-700">Sort By:</span>
-        <div
-          role="group"
+        <fieldset
           aria-label="Select sort by"
           className="inline-flex rounded-lg border border-gray-300 overflow-hidden"
         >
@@ -52,13 +51,13 @@ export default function TableControls({
                     ? "border-r border-gray-300"
                     : "",
                 ].join(" ")}
-                onClick={() => onSortByChange(value)}
+                onClick={() => onSortByChangeAction(value)}
               >
                 {value.charAt(0).toUpperCase() + value.slice(1)}
               </button>
             );
           })}
-        </div>
+        </fieldset>
       </div>
 
       <div className="mt-3 mb-6 flex items-center gap-3">
@@ -75,7 +74,7 @@ export default function TableControls({
                 type="button"
                 aria-pressed={isActive}
                 disabled={isActive}
-                onClick={() => onGameWeekRangeChange(n)}
+                onClick={() => onGameWeekRangeChangeAction(n)}
                 className={[
                   "px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1",
                   "disabled:cursor-not-allowed disabled:opacity-100 text-gray-800",
@@ -97,7 +96,7 @@ export default function TableControls({
           type="button"
           disabled={windowMin <= minWeek}
           className="inline-flex rounded-lg border border-gray-300 overflow-hidden px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-100 text-gray-800 bg-white hover:bg-gray-100"
-          onClick={() => onWindowChange("prev")}
+          onClick={() => onWindowChangeAction("prev")}
         >
           <div className="flex items-center gap-2">
             <AltArrowLeft />
@@ -111,7 +110,7 @@ export default function TableControls({
           type="button"
           disabled={windowMax >= maxWeek}
           className="inline-flex rounded-lg border border-gray-300 overflow-hidden px-3 py-1 text-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gray-400 focus-visible:ring-offset-1 disabled:cursor-not-allowed disabled:opacity-100 text-gray-800 bg-white hover:bg-gray-100"
-          onClick={() => onWindowChange("next")}
+          onClick={() => onWindowChangeAction("next")}
         >
           <div className="flex items-center gap-2">
             <span>Next GW</span>

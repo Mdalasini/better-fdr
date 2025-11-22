@@ -1,10 +1,9 @@
 "use client";
 
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { useMemo, useState } from "react";
 import type { Fixture } from "@/lib/types/fixtures";
-import type { TeamData } from "@/lib/types/teams";
 import { sortByGameweek, sortByGameweekRange } from "./utils";
-import { ChevronDown, ChevronUp } from "lucide-react";
 
 interface Props {
   min: number;

@@ -29,7 +29,7 @@ function Table() {
   const teamsQuery = useTeams();
   const fixturesQuery = useFixtures();
   const gameweekQuery = useCurrentGameweek();
-  const [window, setWindow] = useState([1, 1 + WINDOW_SIZE - 1]);
+  const [tableWindow, setTableWindow] = useState([1, 1 + WINDOW_SIZE - 1]);
   const [sortBy, setSortBy] = useState<"offense" | "defense">("offense");
   const [orderedTeamIds, setOrderedTeamIds] = useState<number[] | null>(null);
   const [gameweekRange, setGameweekRange] = useState(5);
@@ -38,7 +38,7 @@ function Table() {
   useEffect(() => {
     if (gameweekQuery.data) {
       const gameweek = gameweekQuery.data.gameweek;
-      setWindow([gameweek, gameweek + WINDOW_SIZE - 1]);
+      setTableWindow([gameweek, gameweek + WINDOW_SIZE - 1]);
     }
   }, [gameweekQuery.data]);
 
@@ -49,7 +49,7 @@ function Table() {
   const gameweekStats = fixturesQuery.data
     ? getMinMaxGameweek(fixturesQuery.data)
     : { min: 0, max: 0 };
-  const [windowMin, windowMax] = window;
+  const [tableWindowMin, tableWindowMax] = tableWindow;
 
   // Header-managed ordering: fall back to default order when unset
   const defaultTeamIds = useMemo(() => {
@@ -60,7 +60,7 @@ function Table() {
   }, [teamsQuery.data]);
 
   function handleWindowChange(direction: "next" | "prev") {
-    setWindow(([min, max]) => {
+    setTableWindow(([min, max]) => {
       if (direction === "next") {
         const nextMax = Math.min(gameweekStats.max, max + 1);
         const nextMin = Math.min(min + 1, nextMax - WINDOW_SIZE + 1);
@@ -146,21 +146,21 @@ function Table() {
 
       <div className="bg-white rounded-lg shadow-sm p-4 w-full">
         <TableControls
-          onWindowChange={handleWindowChange}
-          onSortByChange={handleSortByChange}
+          onWindowChangeAction={handleWindowChange}
+          onSortByChangeAction={handleSortByChange}
           sortBy={sortBy}
-          windowMin={windowMin}
-          windowMax={windowMax}
+          windowMin={tableWindowMin}
+          windowMax={tableWindowMax}
           minWeek={gameweekStats.min}
           maxWeek={gameweekStats.max}
           gameWeekRange={gameweekRange}
-          onGameWeekRangeChange={setGameweekRange}
+          onGameWeekRangeChangeAction={setGameweekRange}
         />
         <div className="overflow-x-auto mt-5">
           <table className="table-auto w-full border-separate border-spacing-x-2 border-spacing-y-4">
             <TableHeader
-              min={windowMin}
-              max={windowMax}
+              min={tableWindowMin}
+              max={tableWindowMax}
               fixtures={fixturesQuery.data}
               sortBy={sortBy}
               onOrderChange={(ids) => setOrderedTeamIds(ids)}
@@ -172,8 +172,8 @@ function Table() {
                   sortBy={sortBy}
                   key={teamId}
                   teamId={teamId}
-                  min={windowMin}
-                  max={windowMax}
+                  min={tableWindowMin}
+                  max={tableWindowMax}
                 />
               ))}
             </tbody>
