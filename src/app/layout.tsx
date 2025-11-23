@@ -3,7 +3,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "Better FDR",
-  description: "Fixture deficulty rating for Fantasy Premier League",
+  description: "Fixture difficulty rating for Fantasy Premier League",
   icons: "/images/logo.svg",
 };
 
