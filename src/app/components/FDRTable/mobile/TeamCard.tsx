@@ -1,13 +1,15 @@
 "use client";
 
+import { useMemo } from "react";
 import { useFDRData } from "../context/FDRDataProvider";
 import { FixtureRow } from "./FixtureRow";
+import { DifficultyBadge } from "../shared/DifficultyBadge";
 import type { SortBy } from "../types";
 import {
   getOpponentsForRange,
   calculateAttackDifficulty,
   calculateDefenseDifficulty,
-  getDifficultyColors,
+  getDifficultyFromPercentile,
 } from "../utils";
 
 interface TeamCardProps {
@@ -22,7 +24,30 @@ interface TeamCardProps {
  * Shows aggregate difficulty stats in the header with sleek, minimal styling
  */
 export function TeamCard({ teamId, min, max, sortBy }: TeamCardProps) {
-  const { fixtures, teamById, leagueMean } = useFDRData();
+  const { fixtures, teamById, leagueMean, teams } = useFDRData();
+
+  // Calculate all team scores for percentile ranking
+  const allTeamScores = useMemo(() => {
+    if (!teams || !fixtures || !teamById) return [];
+
+    return teams.map((t) => {
+      const opponents = getOpponentsForRange(t.id, min, max, fixtures);
+      if (sortBy === "offense") {
+        return calculateAttackDifficulty(
+          t.off_rating,
+          opponents,
+          teamById,
+          leagueMean,
+        ).score;
+      }
+      return calculateDefenseDifficulty(
+        t.def_rating,
+        opponents,
+        teamById,
+        leagueMean,
+      ).score;
+    });
+  }, [teams, fixtures, teamById, leagueMean, min, max, sortBy]);
 
   if (!fixtures || !teamById) return null;
 
@@ -48,9 +73,10 @@ export function TeamCard({ teamId, min, max, sortBy }: TeamCardProps) {
 
   const displayScore =
     sortBy === "offense" ? attackStats.score : defenseStats.score;
-  const displayDifficulty =
-    sortBy === "offense" ? attackStats.difficulty : defenseStats.difficulty;
-  const colors = getDifficultyColors(displayDifficulty);
+  const percentileDifficulty = getDifficultyFromPercentile(
+    displayScore,
+    allTeamScores,
+  );
 
   return (
     <div className="bg-white rounded-xl border border-slate-200 overflow-hidden">
@@ -58,9 +84,9 @@ export function TeamCard({ teamId, min, max, sortBy }: TeamCardProps) {
       <div className="px-4 py-3 border-b border-slate-100">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div
-              className={`w-2 h-8 rounded-full ${colors.dot}`}
-              aria-hidden="true"
+            <DifficultyBadge
+              difficulty={percentileDifficulty}
+              className="w-2 h-8"
             />
             <div>
               <h3 className="text-base font-semibold text-slate-900">
@@ -70,11 +96,8 @@ export function TeamCard({ teamId, min, max, sortBy }: TeamCardProps) {
             </div>
           </div>
           <div className="text-right">
-            <div className="text-lg font-semibold text-slate-900 tabular-nums">
-              {displayScore.toFixed(2)}
-            </div>
             <div className="text-xs text-slate-500">
-              {sortBy === "offense" ? "Attack" : "Defense"} rating
+              {sortBy === "offense" ? "Attack" : "Defense"}
             </div>
           </div>
         </div>

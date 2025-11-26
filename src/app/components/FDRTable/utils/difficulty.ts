@@ -29,6 +29,32 @@ function getDifficultyRating(score: number): Difficulty {
 }
 
 /**
+ * Calculate difficulty based on percentile ranking
+ * Top 66 percentile = easy, bottom 33 percentile = hard
+ * Higher scores are better (easier fixtures)
+ */
+export function getDifficultyFromPercentile(
+  score: number,
+  allScores: number[],
+): Difficulty {
+  if (score === 0 || allScores.length === 0) return "invalid";
+
+  // Filter out invalid scores (0)
+  const validScores = allScores.filter((s) => s > 0);
+  if (validScores.length === 0) return "invalid";
+
+  // Count how many scores are less than the current score
+  const countBelow = validScores.filter((s) => s < score).length;
+  const percentile = (countBelow / validScores.length) * 100;
+
+  // Top 66 percentile = easy (score is better than 66% of others)
+  // Bottom 33 percentile = hard (score is worse than 67% of others)
+  if (percentile >= 66) return "easy";
+  if (percentile <= 33) return "hard";
+  return "medium";
+}
+
+/**
  * Get opponents for a team in a specific gameweek
  */
 export function getOpponentsForGameweek(
