@@ -48,9 +48,9 @@ export function useFDRControls({
   // Calculate window size based on device type
   const windowSize = isDesktop ? DESKTOP_WINDOW_SIZE : gameweekRange;
 
-  // Set initial window only once when currentGameweek first becomes available
+  // Set initial window only once when currentGameweek and gameweekStats are both available
   useEffect(() => {
-    if (currentGameweek && !initializedRef.current) {
+    if (currentGameweek && gameweekStats.max > 0 && !initializedRef.current) {
       const endWeek = Math.min(
         currentGameweek + windowSize - 1,
         gameweekStats.max,
