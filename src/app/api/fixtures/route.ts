@@ -13,8 +13,8 @@ const getCachedFixtures = unstable_cache(
 
 export async function GET() {
   try {
-    const fixtures = await getCachedFixtures();
-    return NextResponse.json(fixtures);
+    const fixturesResponse = await getCachedFixtures();
+    return NextResponse.json(fixturesResponse);
   } catch (error) {
     console.error("Error in fixtures API route:", error);
     return NextResponse.json(

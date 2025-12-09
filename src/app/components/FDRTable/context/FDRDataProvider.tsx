@@ -4,7 +4,6 @@ import { createContext, useContext, useMemo } from "react";
 import type React from "react";
 import { useSetup } from "@/lib/hooks/useSetup";
 import { useFixtures } from "@/lib/hooks/useFixtures";
-import { useCurrentGameweek } from "@/lib/hooks/useCurrentGameweek";
 import type { Fixture } from "@/lib/types/fixtures";
 import type { FDRDataContextValue, GameweekStats } from "../types";
 import { useDifficultyScores } from "../hooks/useDifficultyScores";
@@ -40,12 +39,11 @@ interface FDRDataProviderProps {
 export function FDRDataProvider({ children }: FDRDataProviderProps) {
   const setupQuery = useSetup();
   const fixturesQuery = useFixtures();
-  const gameweekQuery = useCurrentGameweek();
 
   // Precompute all difficulty scores
   const difficultyScores = useDifficultyScores(
     setupQuery.data?.teams,
-    fixturesQuery.data,
+    fixturesQuery.data?.fixtures,
   );
 
   // Memoize derived values
@@ -60,14 +58,14 @@ export function FDRDataProvider({ children }: FDRDataProviderProps) {
   }, [setupQuery.data]);
 
   const gameweekStats = useMemo(() => {
-    if (!fixturesQuery.data) return { min: 0, max: 0 };
-    return getGameweekStats(fixturesQuery.data);
+    if (!fixturesQuery.data?.fixtures) return { min: 0, max: 0 };
+    return getGameweekStats(fixturesQuery.data.fixtures);
   }, [fixturesQuery.data]);
 
   const value: FDRDataContextValue = {
     teams: setupQuery.data?.teams,
-    fixtures: fixturesQuery.data,
-    currentGameweek: gameweekQuery.data?.gameweek,
+    fixtures: fixturesQuery.data?.fixtures,
+    currentGameweek: fixturesQuery.data?.currentGameweek,
     difficultyScores,
     gameweekStats,
     isLoading: setupQuery.isLoading || fixturesQuery.isLoading,

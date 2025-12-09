@@ -10,7 +10,13 @@ export const FixtureSchema = z.object({
   kickoff_time: z.string().pipe(z.coerce.date()),
 });
 
+export const FixturesResponseSchema = z.object({
+  fixtures: z.array(FixtureSchema),
+  currentGameweek: z.number(),
+});
+
 export const FixturesArraySchema = z.array(FixtureSchema);
 
 export type Fixture = z.infer<typeof FixtureSchema>;
 export type FixturesArray = z.infer<typeof FixturesArraySchema>;
+export type FixturesResponse = z.infer<typeof FixturesResponseSchema>;
