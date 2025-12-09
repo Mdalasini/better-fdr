@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useMemo } from "react";
 import type React from "react";
-import { useTeams } from "@/lib/hooks/useTeams";
+import { useSetup } from "@/lib/hooks/useSetup";
 import { useFixtures } from "@/lib/hooks/useFixtures";
 import { useCurrentGameweek } from "@/lib/hooks/useCurrentGameweek";
 import type { Fixture } from "@/lib/types/fixtures";
@@ -38,26 +38,26 @@ interface FDRDataProviderProps {
  * This eliminates prop drilling and ensures single source of truth
  */
 export function FDRDataProvider({ children }: FDRDataProviderProps) {
-  const teamsQuery = useTeams();
+  const setupQuery = useSetup();
   const fixturesQuery = useFixtures();
   const gameweekQuery = useCurrentGameweek();
 
   // Precompute all difficulty scores
   const difficultyScores = useDifficultyScores(
-    teamsQuery.data,
+    setupQuery.data?.teams,
     fixturesQuery.data,
   );
 
   // Memoize derived values
   const teamById = useMemo(() => {
-    if (!teamsQuery.data) return {};
-    return createTeamLookup(teamsQuery.data);
-  }, [teamsQuery.data]);
+    if (!setupQuery.data) return {};
+    return createTeamLookup(setupQuery.data.teams);
+  }, [setupQuery.data]);
 
   const leagueMean = useMemo(() => {
-    if (!teamsQuery.data) return 0;
-    return calculateLeagueMean(teamsQuery.data);
-  }, [teamsQuery.data]);
+    if (!setupQuery.data) return 0;
+    return calculateLeagueMean(setupQuery.data.teams);
+  }, [setupQuery.data]);
 
   const gameweekStats = useMemo(() => {
     if (!fixturesQuery.data) return { min: 0, max: 0 };
@@ -65,13 +65,13 @@ export function FDRDataProvider({ children }: FDRDataProviderProps) {
   }, [fixturesQuery.data]);
 
   const value: FDRDataContextValue = {
-    teams: teamsQuery.data,
+    teams: setupQuery.data?.teams,
     fixtures: fixturesQuery.data,
     currentGameweek: gameweekQuery.data?.gameweek,
     difficultyScores,
     gameweekStats,
-    isLoading: teamsQuery.isLoading || fixturesQuery.isLoading,
-    isError: teamsQuery.isError || fixturesQuery.isError,
+    isLoading: setupQuery.isLoading || fixturesQuery.isLoading,
+    isError: setupQuery.isError || fixturesQuery.isError,
     teamById,
     leagueMean,
   };
