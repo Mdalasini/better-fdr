@@ -1,29 +1,27 @@
-import dbConnect from "../infra/libsql";
-import { type Fixture, FixtureSchema } from "../types/fixtures";
+import { type Fixture, FixturesArraySchema } from "../types/fixtures";
+
+const FPL_BOOTSTRAP_URL = "https://fantasy.premierleague.com/api/fixtures/";
 
 export async function getFixtures(): Promise<Fixture[]> {
-  const db = await dbConnect();
-  const result = await db.execute("SELECT * FROM fixtures");
-  return result.rows.map((row) => FixtureSchema.parse(row));
-}
+  try {
+    const response = await fetch(FPL_BOOTSTRAP_URL, {
+      headers: {
+        "User-Agent": "Mozilla/5.0 (compatible; FPL-App/1.0)",
+      },
+      signal: AbortSignal.timeout(10000), // 10 second timeout
+    });
 
-export async function getFixture(code: number): Promise<Fixture | null> {
-  const db = await dbConnect();
-  const result = await db.execute("SELECT * FROM fixtures WHERE code = ?", [
-    code,
-  ]);
-  if (result.rows.length === 0) return null;
-  return FixtureSchema.parse(result.rows[0]);
-}
+    if (!response.ok) {
+      throw new Error(
+        `FPL API returned ${response.status}: ${response.statusText}`,
+      );
+    }
+    const data = await response.json();
 
-export async function getFixturesNotInEloChanges(): Promise<Fixture[]> {
-  const db = await dbConnect();
-  const result = await db.execute(
-    `
-    SELECT * FROM fixtures
-    WHERE code NOT IN (SELECT fixture_code FROM fixture_elo_changes)
-    AND (team_h_xg IS NOT NULL OR team_a_xg IS NOT NULL)
-  `,
-  );
-  return result.rows.map((row) => FixtureSchema.parse(row));
+    const fixtures = FixturesArraySchema.parse(data);
+    return fixtures;
+  } catch (error) {
+    console.error("Error fetching fixtures:", error);
+    return [];
+  }
 }
