@@ -62,17 +62,18 @@ async function getTeamEloData(): Promise<
   const db = await dbConnect();
   const result = await db.execute(
     `
-    SELECT t.id, e.off_elo AS off_rating, e.def_elo AS def_rating
-    FROM teams t
-    LEFT JOIN team_elos e ON t.id = e.team_id
-    GROUP BY t.id, t.name, t.short_name
+    SELECT
+      team_id,
+      1700 - ((off_rank - 1) * 400 / 19) AS off_rating,
+      1700 - ((def_rank - 1) * 400 / 19) AS def_rating
+    FROM team_rankings
     `,
   );
 
   const eloMap = new Map<number, { off_rating: number; def_rating: number }>();
 
   for (const row of result.rows) {
-    eloMap.set(row.id as number, {
+    eloMap.set(row.team_id as number, {
       off_rating: (row.off_rating as number) || 0,
       def_rating: (row.def_rating as number) || 0,
     });
