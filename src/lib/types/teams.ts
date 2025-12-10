@@ -1,13 +1,18 @@
-import { z } from "zod";
+import z from "zod";
 
-export const TeamDataSchema = z.object({
-  id: z.number(),
-  name: z.string(),
-  short_name: z.string(),
-  off_rating: z.number(),
-  def_rating: z.number(),
+export const TeamEloSchema = z.object({
+  team_id: z.number().min(1).max(20),
+  off_elo: z.number().min(1300).max(1700),
+  def_elo: z.number().min(1300).max(1700),
 });
 
-export type TeamData = z.infer<typeof TeamDataSchema>;
+export const TeamRankingsSchema = z.object({
+  team_id: z.number().min(1).max(20),
+  off_rank: z.number().min(1).max(20),
+  def_rank: z.number().min(1).max(20),
+});
 
-export type TeamsResponse = TeamData[];
+export const TeamRankingsArraySchema = z.array(TeamRankingsSchema);
+
+export type TeamRankings = z.infer<typeof TeamRankingsSchema>;
+export type TeamElo = z.infer<typeof TeamEloSchema>;
