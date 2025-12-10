@@ -1,11 +1,11 @@
 "use client";
 
+import type { EnrichedTeam } from "@/lib/types/gameSetup";
 import type { Opponent } from "../types";
-import type { TeamData } from "@/lib/types/teams";
 
 interface OpponentChipProps {
   opponent: Opponent;
-  team: TeamData;
+  team: EnrichedTeam;
   className?: string;
 }
 

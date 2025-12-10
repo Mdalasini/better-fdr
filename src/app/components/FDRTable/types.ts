@@ -1,5 +1,5 @@
 import type { Fixture } from "@/lib/types/fixtures";
-import type { TeamData } from "@/lib/types/teams";
+import type { EnrichedTeam } from "@/lib/types/gameSetup";
 
 export interface Opponent {
   id: number;
@@ -58,13 +58,13 @@ export interface FDRControls {
 }
 
 export interface FDRDataContextValue {
-  teams: TeamData[] | undefined;
+  teams: EnrichedTeam[] | undefined;
   fixtures: Fixture[] | undefined;
   currentGameweek: number | undefined;
   difficultyScores: DifficultyScores | null;
   gameweekStats: GameweekStats;
   isLoading: boolean;
   isError: boolean;
-  teamById: Record<number, TeamData>;
+  teamById: Record<number, EnrichedTeam>;
   leagueMean: number;
 }

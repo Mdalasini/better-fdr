@@ -2,7 +2,6 @@
 
 import { useMemo } from "react";
 import type { Fixture } from "@/lib/types/fixtures";
-import type { TeamData } from "@/lib/types/teams";
 import type { DifficultyScores, GameweekScore } from "../types";
 import {
   getOpponentsForGameweek,
@@ -12,13 +11,14 @@ import {
   calculateLeagueMean,
 } from "../utils";
 import { sortByGameweek } from "../utils/sorting";
+import type { EnrichedTeam } from "@/lib/types/gameSetup";
 
 /**
  * Hook that precomputes ALL difficulty scores for all teams and gameweeks
  * This eliminates duplicate calculations across components
  */
 export function useDifficultyScores(
-  teams: TeamData[] | undefined,
+  teams: EnrichedTeam[] | undefined,
   fixtures: Fixture[] | undefined,
 ): DifficultyScores | null {
   return useMemo(() => {
@@ -30,9 +30,9 @@ export function useDifficultyScores(
     const leagueMean = calculateLeagueMean(teams);
 
     // Get all unique gameweeks
-    const gameweeks = Array.from(
-      new Set(fixtures.map((f) => f.event)),
-    ).sort((a, b) => a - b);
+    const gameweeks = Array.from(new Set(fixtures.map((f) => f.event))).sort(
+      (a, b) => a - b,
+    );
 
     const difficultyScores: DifficultyScores = {
       byTeam: {},

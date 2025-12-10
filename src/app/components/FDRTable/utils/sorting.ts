@@ -1,5 +1,5 @@
 import type { Fixture } from "@/lib/types/fixtures";
-import type { TeamData } from "@/lib/types/teams";
+import type { EnrichedTeam } from "@/lib/types/gameSetup";
 import type { SortDirection, SortBy } from "../types";
 import {
   getOpponentsForGameweek,
@@ -16,14 +16,18 @@ export function sortByGameweek(
   gameweek: number,
   direction: SortDirection,
   sortBy: SortBy,
-  teamById: Record<number, TeamData>,
+  teamById: Record<number, EnrichedTeam>,
   leagueMean: number,
 ): number[] {
   const teamScores: { teamId: number; score: number }[] = [];
 
   Object.keys(teamById).forEach((teamId) => {
     const numericTeamId = parseInt(teamId, 10);
-    const opponents = getOpponentsForGameweek(numericTeamId, gameweek, fixtures);
+    const opponents = getOpponentsForGameweek(
+      numericTeamId,
+      gameweek,
+      fixtures,
+    );
     const team = teamById[numericTeamId];
 
     let score: number;
@@ -67,7 +71,7 @@ export function sortByGameweekRange(
   endWeek: number,
   direction: SortDirection,
   sortBy: SortBy,
-  teamById: Record<number, TeamData>,
+  teamById: Record<number, EnrichedTeam>,
   leagueMean: number,
 ): number[] {
   const teamScores: { teamId: number; score: number }[] = [];

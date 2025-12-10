@@ -1,6 +1,6 @@
 import type { Fixture } from "@/lib/types/fixtures";
-import type { TeamData } from "@/lib/types/teams";
 import type { Opponent, Difficulty, DifficultyScore } from "../types";
+import type { EnrichedTeam } from "@/lib/types/gameSetup";
 
 /**
  * Squash function: sigmoid-like transformation centered around league mean
@@ -97,7 +97,7 @@ export function getOpponentsForRange(
 export function calculateAttackDifficulty(
   offenseRating: number,
   opponents: Opponent[],
-  teamById: Record<number, TeamData>,
+  teamById: Record<number, EnrichedTeam>,
   leagueMean: number,
   k = 0.01,
 ): DifficultyScore {
@@ -120,7 +120,7 @@ export function calculateAttackDifficulty(
 export function calculateDefenseDifficulty(
   defenseRating: number,
   opponents: Opponent[],
-  teamById: Record<number, TeamData>,
+  teamById: Record<number, EnrichedTeam>,
   leagueMean: number,
   k = 0.01,
 ): DifficultyScore {
@@ -140,7 +140,7 @@ export function calculateDefenseDifficulty(
 /**
  * Calculate league mean from all teams
  */
-export function calculateLeagueMean(teams: TeamData[]): number {
+export function calculateLeagueMean(teams: EnrichedTeam[]): number {
   if (teams.length === 0) return 0;
 
   const allScores = teams.map((t) => t.off_rating - t.def_rating);
@@ -151,8 +151,10 @@ export function calculateLeagueMean(teams: TeamData[]): number {
 /**
  * Create a team lookup object by ID
  */
-export function createTeamLookup(teams: TeamData[]): Record<number, TeamData> {
-  const lookup: Record<number, TeamData> = {};
+export function createTeamLookup(
+  teams: EnrichedTeam[],
+): Record<number, EnrichedTeam> {
+  const lookup: Record<number, EnrichedTeam> = {};
   teams.forEach((team) => {
     lookup[team.id] = team;
   });
