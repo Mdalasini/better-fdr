@@ -2,6 +2,26 @@ import z from "zod";
 import dbConnect from "../infra/libsql";
 import { type TeamRankings, TeamRankingsArraySchema } from "../types/teams";
 
+async function ensureTeamRankingsTableExists() {
+  const db = await dbConnect();
+
+  try {
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS team_rankings (
+        team_id INTEGER PRIMARY KEY,
+        off_rank REAL NOT NULL,
+        def_rank REAL NOT NULL,
+        updated_at TIMESTAMP NOT NULL
+      )
+    `);
+  } catch (error) {
+    console.error("Error ensuring team_rankings table exists:", error);
+    throw new Error(
+      `Failed to ensure team_rankings table exists: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
+}
+
 function parseTeamRankings(teamRankings: Array<unknown>): TeamRankings[] {
   try {
     return TeamRankingsArraySchema.parse(teamRankings);
@@ -50,6 +70,9 @@ export async function updateTeamRankings(teamRankings: TeamRankings[]) {
   const db = await dbConnect();
 
   try {
+    // Ensure table exists before inserting data
+    await ensureTeamRankingsTableExists();
+
     // Validate input data
     inputsAreValid(teamRankings);
 
