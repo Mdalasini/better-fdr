@@ -7,7 +7,7 @@ const getCachedGameSetup = unstable_cache(
   ["setup"],
   {
     tags: ["setup"],
-    revalidate: false, // Manual revalidation only
+    revalidate: 86400, // revalidation after 24 hours
   },
 );
 
