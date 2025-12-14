@@ -1,34 +1,8 @@
-import {
-  type Fixture,
-  FixturesArraySchema,
-  type FixturesResponse,
-} from "../types/fixtures";
+import { type Fixture, FixturesArraySchema } from "../types/fixtures";
 
 const FPL_BOOTSTRAP_URL = "https://fantasy.premierleague.com/api/fixtures/";
 
-function calculateCurrentGameweek(fixtures: Fixture[]): number {
-  const now = new Date();
-
-  // Find the first fixture that hasn't finished and has a kickoff time in the future
-  const nextFixture = fixtures
-    .filter(
-      (fixture) => !fixture.finished && new Date(fixture.kickoff_time) > now,
-    )
-    .sort(
-      (a, b) =>
-        new Date(a.kickoff_time).getTime() - new Date(b.kickoff_time).getTime(),
-    )[0];
-
-  if (nextFixture) {
-    return nextFixture.event;
-  }
-
-  // If no future fixture found, return the highest event number (last gameweek)
-  const maxEvent = Math.max(...fixtures.map((f) => f.event));
-  return maxEvent;
-}
-
-export async function getFixtures(): Promise<FixturesResponse> {
+export async function getFixtures(): Promise<Fixture[]> {
   try {
     const response = await fetch(FPL_BOOTSTRAP_URL, {
       headers: {
@@ -45,17 +19,9 @@ export async function getFixtures(): Promise<FixturesResponse> {
     const data = await response.json();
 
     const fixtures = FixturesArraySchema.parse(data);
-    const currentGameweek = calculateCurrentGameweek(fixtures);
-
-    return {
-      fixtures,
-      currentGameweek,
-    };
+    return fixtures;
   } catch (error) {
     console.error("Error fetching fixtures:", error);
-    return {
-      fixtures: [],
-      currentGameweek: 1, // Default fallback
-    };
+    return [];
   }
 }
