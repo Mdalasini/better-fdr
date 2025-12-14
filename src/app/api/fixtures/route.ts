@@ -7,7 +7,7 @@ const getCachedFixtures = unstable_cache(
   ["fixtures"],
   {
     tags: ["fixtures"],
-    revalidate: false, // Manual revalidation only
+    revalidate: 86400, // revalidation after 24 hours
   },
 );
 
