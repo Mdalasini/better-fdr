@@ -7,6 +7,13 @@ import {
 } from "../domain/teams";
 import dbConnect from "../infra/libsql";
 
+const TeamInputSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  short_name: z.string(),
+  code: z.number(),
+});
+
 export async function getTeams(): Promise<Team[]> {
   const db = await dbConnect();
   const result = await db.execute(
@@ -117,6 +124,89 @@ export async function updateTeamRankings(teamRankings: TeamRankings[]) {
     console.error("Error updating team rankings:", error);
     throw new Error(
       `Failed to update team rankings: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
+}
+
+async function ensureTeamsTableExists() {
+  const db = await dbConnect();
+
+  try {
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS teams (
+        id INTEGER PRIMARY KEY,
+        name TEXT NOT NULL,
+        short_name TEXT NOT NULL,
+        code INTEGER NOT NULL
+      )
+    `);
+  } catch (error) {
+    console.error("Error ensuring teams table exists:", error);
+    throw new Error(
+      `Failed to ensure teams table exists: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
+}
+
+function parseTeams(teams: Array<unknown>) {
+  try {
+    return TeamInputSchema.array().parse(teams);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      const errorDetails = error.issues
+        .map((err) => `${err.path.join(".")}: ${err.message}`)
+        .join(", ");
+      throw new Error(`Invalid teams data: ${errorDetails}`);
+    }
+    throw new Error(
+      `Invalid teams data: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
+}
+
+function validateTeams(teams: Array<unknown>) {
+  if (teams.length !== 20) {
+    throw new Error(`Expected 20 teams, but received ${teams.length}`);
+  }
+
+  const teamsParsed = parseTeams(teams);
+
+  const teamIds = teamsParsed.map((team) => team.id);
+  const uniqueTeamIds = new Set(teamIds);
+
+  if (uniqueTeamIds.size !== 20) {
+    throw new Error("Duplicate team ids found in input");
+  }
+}
+
+export async function updateTeams(teams: Array<unknown>) {
+  const db = await dbConnect();
+
+  try {
+    await ensureTeamsTableExists();
+    validateTeams(teams);
+
+    const teamsParsed = parseTeams(teams);
+
+    // Delete all existing teams
+    await db.execute("DELETE FROM teams");
+
+    // Insert new teams
+    const statements = teamsParsed.map((team) => ({
+      sql: `
+        INSERT INTO teams (id, name, short_name, code)
+        VALUES (?, ?, ?, ?)
+      `,
+      args: [team.id, team.name, team.short_name, team.code],
+    }));
+
+    await db.batch(statements);
+
+    return { success: true, message: "Teams updated successfully" };
+  } catch (error) {
+    console.error("Error updating teams:", error);
+    throw new Error(
+      `Failed to update teams: ${error instanceof Error ? error.message : "Unknown error"}`,
     );
   }
 }
