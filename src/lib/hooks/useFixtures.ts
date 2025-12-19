@@ -5,7 +5,7 @@ export function useFixtures() {
   return useQuery({
     queryKey: ["fixtures"],
     queryFn: async () => {
-      const res = await fetch(`https://api-better-fdr.vercel.app/api/fixtures`);
+      const res = await fetch("/api/fixtures");
       if (!res.ok) throw new Error("Failed to fetch fixtures");
       return res.json() as Promise<Fixture[]>;
     },

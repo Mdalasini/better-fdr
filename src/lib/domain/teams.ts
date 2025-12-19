@@ -9,4 +9,11 @@ export const TeamSchema = z.object({
   def_rank: z.number(),
 });
 
+export const TeamRankingsSchema = z.object({
+  team_id: z.number().min(1).max(20),
+  off_rank: z.number().min(1).max(20),
+  def_rank: z.number().min(1).max(20),
+});
+
+export type TeamRankings = z.infer<typeof TeamRankingsSchema>;
 export type Team = z.infer<typeof TeamSchema>;

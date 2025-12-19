@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
   title: "Better FDR",
@@ -15,12 +16,14 @@ export default function DashboardLayout({
   return (
     <html lang="en">
       <body>
-        <div className="min-h-screen bg-gray-50">
-          {/* Main Content */}
-          <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
-            {children}
-          </main>
-        </div>
+        <Providers>
+          <div className="min-h-screen bg-gray-50">
+            {/* Main Content */}
+            <main className="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+              {children}
+            </main>
+          </div>
+        </Providers>
       </body>
     </html>
   );

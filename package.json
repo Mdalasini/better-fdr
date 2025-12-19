@@ -10,6 +10,7 @@
     "format": "biome format --write"
   },
   "dependencies": {
+    "@libsql/client": "^0.15.15",
     "@solar-icons/react": "^1.0.1",
     "@tanstack/react-query": "^5.90.7",
     "lucide-react": "^0.553.0",

@@ -1,15 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-import type { Fixture } from "../domain/fixtures";
+import type { Team } from "../domain/teams";
 
-export function useFixtures() {
+export function useTeams() {
   return useQuery({
     queryKey: ["teams"],
     queryFn: async () => {
-      const res = await fetch(
-        `https://api-better-fdr.vercel.app/api/setup/teams`,
-      );
+      const res = await fetch("/api/teams");
       if (!res.ok) throw new Error("Failed to fetch teams");
-      return res.json() as Promise<Fixture[]>;
+      return res.json() as Promise<Team[]>;
     },
     enabled: true,
   });
