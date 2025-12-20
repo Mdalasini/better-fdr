@@ -2,7 +2,7 @@ import type { Fixture } from "../domain/fixtures";
 
 /**
  * Get the current gameweek based on fixture kickoff times
- * Returns the first event where at least one fixture hasn't kicked off yet
+ * Returns the first event where no fixtures have kicked off yet
  */
 export function getCurrentGameweek(fixtures: Fixture[]): number {
   const now = new Date();
@@ -15,15 +15,15 @@ export function getCurrentGameweek(fixtures: Fixture[]): number {
     eventFixtures.set(fixture.event, existing);
   }
 
-  // Find the first event where not all fixtures have kicked off
+  // Find the first event where no fixtures have kicked off
   const events = Array.from(eventFixtures.keys()).sort((a, b) => a - b);
 
   for (const event of events) {
     const eventFixtureList = eventFixtures.get(event) || [];
-    const hasUpcoming = eventFixtureList.some(
+    const hasNotStarted = eventFixtureList.every(
       (f) => new Date(f.kickoff_time) > now,
     );
-    if (hasUpcoming) {
+    if (hasNotStarted) {
       return event;
     }
   }
