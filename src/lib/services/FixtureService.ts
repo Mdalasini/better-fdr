@@ -43,6 +43,49 @@ async function ensureFixturesTableExists() {
   }
 }
 
+export async function fetchExternalFixtures(): Promise<unknown[]> {
+  const fplApiUrl = "https://fantasy.premierleague.com/api/fixtures/";
+
+  try {
+    console.log("Fetching fixtures from FPL API...");
+    const response = await fetch(fplApiUrl, {
+      headers: {
+        // FPL API may require a user-agent header
+        "User-Agent": "Mozilla/5.0 (compatible; better-fdr/1.0)",
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`FPL API returned status ${response.status}`);
+    }
+
+    const fixtures = await response.json();
+
+    if (!Array.isArray(fixtures)) {
+      throw new Error("FPL API did not return an array of fixtures");
+    }
+
+    console.log(
+      `Successfully fetched ${fixtures.length} fixtures from FPL API`,
+    );
+    return fixtures;
+  } catch (error) {
+    console.error("Error fetching fixtures from FPL API:", error);
+    throw new Error(
+      `Failed to fetch fixtures from FPL API: ${error instanceof Error ? error.message : "Unknown error"}`,
+    );
+  }
+}
+
+export async function syncFixtures(): Promise<{
+  success: true;
+  message: "Fixtures synced successfully";
+}> {
+  const externalFixtures = await fetchExternalFixtures();
+  await updateFixtures(externalFixtures);
+  return { success: true, message: "Fixtures synced successfully" };
+}
+
 function parseFixtures(fixtures: Array<unknown>) {
   try {
     return FixtureInputSchema.array().parse(fixtures);
